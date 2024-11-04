@@ -76,17 +76,39 @@ public class SingleLinkedList implements ILinkedList {
     }
 
     public void add(int index, Object element){
-
+        if (this.head == null && index == 0){
+            this.head = new Node(element);
+            System.out.println("Got here");
+            this.size++;
+            return;
+        }
+        Node newNode = new Node(element);
+        Node currentNode = this.head;
+        int currentIndex = 0;
+        if (index < -1 || index > size){
+            throw new IndexOutOfBoundsException("Error");
+        }
+        while (currentIndex < index - 1){
+            System.out.println("Got here 1");
+            currentNode = currentNode.next;
+            currentIndex++;
+        }
+        // A 1
+        // B 2
+        //
+        newNode.next = currentNode.next;
+        currentNode.next = newNode;
+        this.size++;
     }
 
     @Override
     public void add(Object element) {
-
+        add(this.size, element);
     }
 
     @Override
     public Object get(int index) {
-        if (index < 0 || index < size -1){
+        if (index < 0 || index > size - 1){
             throw new IndexOutOfBoundsException("Error");
         }
         Node currentNode = this.head;
@@ -100,7 +122,16 @@ public class SingleLinkedList implements ILinkedList {
 
     @Override
     public void set(int index, Object element) {
-
+        if (index < 0 || index > size -1){
+            throw new IndexOutOfBoundsException("Error");
+        }
+        Node currentNode = this.head;
+        int currentIndex = 0;
+        while (currentIndex != index){
+            currentNode = currentNode.next;
+            currentIndex++;
+        }
+        currentNode.data = element;
     }
 
     @Override
@@ -116,7 +147,17 @@ public class SingleLinkedList implements ILinkedList {
 
     @Override
     public void remove(int index) {
-
+        if (index < 0 || index > size -1){
+            throw new IndexOutOfBoundsException("Error");
+        }
+        Node currentNode = this.head;
+        int currentIndex = 0;
+        while (currentIndex != index - 1){
+            currentNode = currentNode.next;
+            currentIndex++;
+        }
+        currentNode.next = currentNode.next.next;
+        this.size--;
     }
     @Override
     public int size() {
@@ -143,6 +184,16 @@ public class SingleLinkedList implements ILinkedList {
     }
 
     public static void main(String[] args) {
-        /* Enter your code here. Read input from STDIN. Print output to STDOUT. */
+        SingleLinkedList list = new SingleLinkedList();
+        list.add("A");
+        list.add("B");
+        list.add(1, "C"); // Insert C at index 1
+        System.out.println("Element at index 1: " + list.get(1)); // Should print C
+        System.out.println("List size: " + list.size()); // Should print 3
+        System.out.println("List contains B: " + list.contains("B")); // Should print true
+        list.remove(1); // Remove element at index 1 (C)
+        System.out.println("List contains C: " + list.contains("C")); // Should print false
+        list.clear(); // Clear the list
+        System.out.println("Is list empty: " + list.isEmpty()); // Should print true
     }
 }
