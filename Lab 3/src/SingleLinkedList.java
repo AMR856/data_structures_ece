@@ -82,22 +82,23 @@ public class SingleLinkedList implements ILinkedList {
             this.head = new Node(element);
             this.size++;
             return;
+        } else if (index == 0){
+            Node newNode = new Node(element);
+            newNode.next = this.head;
+            this.head = newNode;
+            return;
         }
+
         Node newNode = new Node(element);
         Node currentNode = this.head;
         int currentIndex = 0;
-        if (index < -1 || index > size){
-            throw new IndexOutOfBoundsException("Error");
+        if (index <= -1 || index > size){
+            throw new IndexOutOfBoundsException();
         }
         while (currentIndex < index - 1){
             currentNode = currentNode.next;
             currentIndex++;
         }
-//        [40, 98, 36, 67, 83, 25, 64, 36, 10, 31, 70]
-//        [40, 98, 36, 67, 83, 25, 64, 36, 10, 31, 70]
-        // A 1
-        // B 2
-        //
         newNode.next = currentNode.next;
         currentNode.next = newNode;
         this.size++;
@@ -107,11 +108,10 @@ public class SingleLinkedList implements ILinkedList {
     public void add(Object element) {
         add(this.size, element);
     }
-
     @Override
     public Object get(int index) {
         if (index < 0 || index > size - 1){
-            throw new IndexOutOfBoundsException("Error");
+            throw new IndexOutOfBoundsException();
         }
         Node currentNode = this.head;
         int currentIndex = 0;
@@ -125,7 +125,7 @@ public class SingleLinkedList implements ILinkedList {
     @Override
     public void set(int index, Object element) {
         if (index < 0 || index > size - 1){
-            throw new IndexOutOfBoundsException("Error");
+            throw new IndexOutOfBoundsException();
         }
         Node currentNode = this.head;
         int currentIndex = 0;
@@ -133,7 +133,6 @@ public class SingleLinkedList implements ILinkedList {
             currentNode = currentNode.next;
             currentIndex++;
         }
-        System.out.println(element);
         currentNode.data = element;
     }
     @Override
@@ -141,7 +140,6 @@ public class SingleLinkedList implements ILinkedList {
         this.head = null;
         this.size = 0;
     }
-
     @Override
     public boolean isEmpty() {
         return this.head == null || this.size == 0;
@@ -149,12 +147,16 @@ public class SingleLinkedList implements ILinkedList {
 
     @Override
     public void remove(int index) {
-        if (index < 0 || index > size -1){
-            throw new IndexOutOfBoundsException("Error");
+        if (index < 0 || index > size - 1){
+            throw new IndexOutOfBoundsException();
+        }
+        if (index == 0){
+            this.head = head.next;
+            return;
         }
         Node currentNode = this.head;
         int currentIndex = 0;
-        while (currentIndex != index - 1){
+        while (currentIndex < index - 1){
             currentNode = currentNode.next;
             currentIndex++;
         }
@@ -168,6 +170,7 @@ public class SingleLinkedList implements ILinkedList {
 
     @Override
     public ILinkedList sublist(int fromIndex, int toIndex) {
+        if (fromIndex > toIndex) throw new RuntimeException();
         SingleLinkedList newList = new SingleLinkedList();
         for (int i = fromIndex; i <= toIndex; i++){
             newList.add(this.get(i));
@@ -188,12 +191,12 @@ public class SingleLinkedList implements ILinkedList {
         return doesContain;
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         int element, index, index1;
         SingleLinkedList list = new SingleLinkedList();
         Scanner in = new Scanner(System.in);
         String userInput = getTrim(in);
-        String requiredCommand = in.nextLine();
+        String requiredCommand = in.nextLine().trim();
         if (!userInput.isEmpty()){
             try{
                 createList(userInput, list);
@@ -210,7 +213,6 @@ public class SingleLinkedList implements ILinkedList {
                 printList(list);
                 break;
             case "addToIndex":
-
                 index = in.nextInt();
                 element = in.nextInt();
                 try {
@@ -271,12 +273,16 @@ public class SingleLinkedList implements ILinkedList {
                 SingleLinkedList newList = (SingleLinkedList) list.sublist(index, index1);
                 printList(newList);
                 }
-                catch (IndexOutOfBoundsException _){
+                catch (Exception _){
                     System.out.println("Error");
                 }
                 break;
+            default:
+                System.out.println("Error");
+                break;
         }
     }
+
     private static void printList(SingleLinkedList list){
         Node currentNode = list.head;
         System.out.print("[");
@@ -301,3 +307,23 @@ public class SingleLinkedList implements ILinkedList {
         return in.nextLine().replace("[", "").replace("]", "").trim();
     }
 }
+//[40, 98, 36, 83, 25, 64, 36, 10, 31, 70]
+//addToIndex
+//0
+//67
+
+
+//[40, 98, 36, 83, 25, 64, 36, 10, 31, 70]
+//remove
+//0
+
+//[74, 59, 23, 89, 38, 73, 62, 22, 29]
+//clear
+
+//[1, 5]
+//remove
+//2
+
+//[1, 5, 4, 2, 1, 4]
+//get
+//6
