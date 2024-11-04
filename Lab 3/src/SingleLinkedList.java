@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 interface ILinkedList {
     /**
      * Inserts a specified element at the specified position in the list.
@@ -78,7 +80,6 @@ public class SingleLinkedList implements ILinkedList {
     public void add(int index, Object element){
         if (this.head == null && index == 0){
             this.head = new Node(element);
-            System.out.println("Got here");
             this.size++;
             return;
         }
@@ -89,10 +90,11 @@ public class SingleLinkedList implements ILinkedList {
             throw new IndexOutOfBoundsException("Error");
         }
         while (currentIndex < index - 1){
-            System.out.println("Got here 1");
             currentNode = currentNode.next;
             currentIndex++;
         }
+//        [40, 98, 36, 67, 83, 25, 64, 36, 10, 31, 70]
+//        [40, 98, 36, 67, 83, 25, 64, 36, 10, 31, 70]
         // A 1
         // B 2
         //
@@ -122,7 +124,7 @@ public class SingleLinkedList implements ILinkedList {
 
     @Override
     public void set(int index, Object element) {
-        if (index < 0 || index > size -1){
+        if (index < 0 || index > size - 1){
             throw new IndexOutOfBoundsException("Error");
         }
         Node currentNode = this.head;
@@ -131,9 +133,9 @@ public class SingleLinkedList implements ILinkedList {
             currentNode = currentNode.next;
             currentIndex++;
         }
+        System.out.println(element);
         currentNode.data = element;
     }
-
     @Override
     public void clear() {
         this.head = null;
@@ -166,9 +168,12 @@ public class SingleLinkedList implements ILinkedList {
 
     @Override
     public ILinkedList sublist(int fromIndex, int toIndex) {
-        return null;
+        SingleLinkedList newList = new SingleLinkedList();
+        for (int i = fromIndex; i <= toIndex; i++){
+            newList.add(this.get(i));
+        }
+        return newList;
     }
-
     @Override
     public boolean contains(Object o) {
         Node current = this.head;
@@ -183,17 +188,116 @@ public class SingleLinkedList implements ILinkedList {
         return doesContain;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
+        int element, index, index1;
         SingleLinkedList list = new SingleLinkedList();
-        list.add("A");
-        list.add("B");
-        list.add(1, "C"); // Insert C at index 1
-        System.out.println("Element at index 1: " + list.get(1)); // Should print C
-        System.out.println("List size: " + list.size()); // Should print 3
-        System.out.println("List contains B: " + list.contains("B")); // Should print true
-        list.remove(1); // Remove element at index 1 (C)
-        System.out.println("List contains C: " + list.contains("C")); // Should print false
-        list.clear(); // Clear the list
-        System.out.println("Is list empty: " + list.isEmpty()); // Should print true
+        Scanner in = new Scanner(System.in);
+        String userInput = getTrim(in);
+        String requiredCommand = in.nextLine();
+        if (!userInput.isEmpty()){
+            try{
+                createList(userInput, list);
+            }
+            catch (Exception _){
+                System.out.println("Error");
+                return;
+            }
+        }
+        switch (requiredCommand){
+            case "add":
+                element = in.nextInt();
+                list.add(element);
+                printList(list);
+                break;
+            case "addToIndex":
+
+                index = in.nextInt();
+                element = in.nextInt();
+                try {
+                    list.add(index, element);
+                    printList(list);
+                } catch (IndexOutOfBoundsException _){
+                    System.out.println("Error");
+                }
+                break;
+            case "get":
+                index = in.nextInt();
+                try{
+                    element = (int) list.get(index);
+                    System.out.println(element);
+                } catch (IndexOutOfBoundsException _){
+                    System.out.println("Error");
+                }
+                break;
+            case "set":
+                index = in.nextInt();
+                element = in.nextInt();
+                try{
+                    list.set(index, element);
+                    printList(list);
+                } catch(IndexOutOfBoundsException _){
+                    System.out.println("Error");
+                }
+                break;
+            case "clear":
+                list.clear();
+                System.out.println("[]");
+                break;
+            case "isEmpty":
+                if (list.isEmpty()) System.out.println("True");
+                else System.out.println("False");
+                break;
+            case "size":
+                System.out.println(list.size());
+                break;
+            case "remove":
+                index = in.nextInt();
+                try{
+                    list.remove(index);
+                    printList(list);
+                } catch(IndexOutOfBoundsException _){
+                    System.out.println("Error");
+                }
+                break;
+            case "contains":
+                element = in.nextInt();
+                if (list.contains(element)) System.out.println("True");
+                else System.out.println("False");
+                break;
+            case "sublist":
+                index = in.nextInt();
+                index1 = in.nextInt();
+                try {
+                SingleLinkedList newList = (SingleLinkedList) list.sublist(index, index1);
+                printList(newList);
+                }
+                catch (IndexOutOfBoundsException _){
+                    System.out.println("Error");
+                }
+                break;
+        }
+    }
+    private static void printList(SingleLinkedList list){
+        Node currentNode = list.head;
+        System.out.print("[");
+        while (currentNode.next != null){
+            System.out.print(currentNode.data + ", ");
+            currentNode = currentNode.next;
+        }
+        if (currentNode.data != null) System.out.println(currentNode.data + "]");
+        else System.out.println("]");
+    }
+    private static void createList(String userInput, SingleLinkedList list) throws Exception {
+        String []stringArray = userInput.split(", ");
+        for (String s : stringArray) {
+            try {
+                list.add(Integer.parseInt(s));
+            } catch (Exception error) {
+                throw new Exception();
+            }
+        }
+    }
+    private static String getTrim(Scanner in) {
+        return in.nextLine().replace("[", "").replace("]", "").trim();
     }
 }
