@@ -496,7 +496,83 @@ public class PolynomialSolver implements IPolynomialSolver {
 
     @Override
     public int[][] subtract(char poly1, char poly2) {
-        return new int[0][];
+        LinkedList list1 = null;
+        LinkedList list2 = null;
+
+        switch (poly1) {
+            case 'A':
+                list1 = this.A;
+                break;
+            case 'B':
+                list1 = this.B;
+                break;
+            case 'C':
+                list1 = this.C;
+                break;
+            default:
+                System.out.println("Error");
+                System.exit(0);
+                break;
+        }
+        switch (poly2) {
+            case 'A':
+                list2 = this.A;
+                break;
+            case 'B':
+                list2 = this.B;
+                break;
+            case 'C':
+                list2 = this.C;
+                break;
+            default:
+                System.out.println("Error");
+                System.exit(0);
+                break;
+        }
+        if (list1 == null || list2 == null){
+            System.out.println("Error");
+            System.exit(0);
+        }
+        ListNode current1 = list1.head;
+        ListNode current2 = list2.head;
+        int list1Length = list1.size;
+        int list2Length = list2.size;
+        int sum;
+        if (list1Length > list2Length){
+            System.out.println("Got here");
+            R.add(new Term(list1Length - 1, current1.data.coefficient));
+            System.out.print("Term: " + current1.data.exponent + ' ' + current1.data.coefficient  + '\n');
+            current1 = current1.next;
+            list1Length--;
+        }
+        else if (list2Length > list1Length) {
+            System.out.println("Got here");
+            R.add(new Term(list2Length - 1, -1 * current2.data.coefficient));
+            System.out.print("Term: " + current2.data.exponent + ' ' + -1 * current2.data.coefficient + '\n');
+            current2 = current2.next;
+            list2Length--;
+        }
+        while (list1Length != 0) {
+            sum = current1.data.coefficient - current2.data.coefficient;
+            if (sum != 0) R.add(new Term(list1Length - 1, sum));
+            System.out.print("Term: " + current1.data.exponent + ' ' + current1.data.coefficient  + '\n');
+            System.out.print("Term: " + current2.data.exponent + ' ' + current2.data.coefficient  + '\n');
+            current1 = current1.next;
+            current2 = current2.next;
+            list1Length--;
+            list2Length--;
+        }
+        ListNode currentR = R.head;
+        int [][]returnedArray = new int[R.size][2];
+        int i = 0;
+        while (currentR != null){
+            returnedArray[i][0] = currentR.data.exponent;
+            returnedArray[i][1] = currentR.data.coefficient;
+            System.out.print("Term: " + currentR.data.exponent + ' ' + currentR.data.coefficient  + '\n');
+            i++;
+            currentR = currentR.next;
+        }
+        return returnedArray;
     }
 
     @Override
