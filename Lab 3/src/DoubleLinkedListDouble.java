@@ -1,10 +1,6 @@
-import java.io.*;
 import java.util.*;
-import java.text.*;
-import java.math.*;
-import java.util.regex.*;
 
-interface ILinkedList {
+interface ILinkedListDouble {
 /**
 * Inserts a specified element at the specified position in the list.
 * @param index
@@ -51,7 +47,7 @@ public int size();
 * @param toIndex
 * @return a view of the portion of this list between the specified fromIndex and toIndex, inclusively.
 */
-public ILinkedList sublist(int fromIndex, int toIndex);
+public ILinkedListDouble sublist(int fromIndex, int toIndex);
 /**
 * @param o
 * @return true if this list contains an element with the same value as the specified element.
@@ -71,12 +67,12 @@ class DoublyNode {
     }
 }
 
-public class DoubleLinkedList implements ILinkedList {
+public class DoubleLinkedListDouble implements ILinkedListDouble {
     private DoublyNode head;
     private DoublyNode tail;
     private int size;
 
-    public DoubleLinkedList() {
+    public DoubleLinkedListDouble() {
         this.head = null;
         this.tail = null;
         this.size = 0;
@@ -106,7 +102,7 @@ public class DoubleLinkedList implements ILinkedList {
             current.prev.next = newNode;
             current.prev = newNode;
         }
-        thi.size++;
+        this.size++;
     }
 
     @Override
@@ -178,10 +174,10 @@ public class DoubleLinkedList implements ILinkedList {
     }
 
     @Override
-    public ILinkedList sublist(int fromIndex, int toIndex) {
+    public ILinkedListDouble sublist(int fromIndex, int toIndex) {
         if (fromIndex < 0 || toIndex >= size || fromIndex > toIndex) throw new IndexOutOfBoundsException();
         
-        DoubleLinkedList subList = new DoubleLinkedList();
+        DoubleLinkedListDouble subList = new DoubleLinkedListDouble();
         DoublyNode current = getNodeAt(fromIndex);
         for (int i = fromIndex; i <= toIndex; i++) {
             subList.add(current.data);
@@ -202,7 +198,7 @@ public class DoubleLinkedList implements ILinkedList {
 
     public static void main(String[] args) {
         int element, index, index1;
-        DoubleLinkedList list = new DoubleLinkedList();
+        DoubleLinkedListDouble list = new DoubleLinkedListDouble();
         Scanner in = new Scanner(System.in);
         String userInput = getTrim(in);
         String requiredCommand = in.nextLine().trim();
@@ -279,7 +275,7 @@ public class DoubleLinkedList implements ILinkedList {
                 index = in.nextInt();
                 index1 = in.nextInt();
                 try {
-                DoubleLinkedList newList = (DoubleLinkedList) list.sublist(index, index1);
+                DoubleLinkedListDouble newList = (DoubleLinkedListDouble) list.sublist(index, index1);
                 printList(newList);
                 }
                 catch (Exception _){
@@ -293,7 +289,7 @@ public class DoubleLinkedList implements ILinkedList {
     }
 
     
-    private static void printList(DoubleLinkedList list) {
+    private static void printList(DoubleLinkedListDouble list) {
         DoublyNode currentNode = list.head;
         System.out.print("[");
         while (currentNode != null) {
@@ -304,7 +300,7 @@ public class DoubleLinkedList implements ILinkedList {
         System.out.println("]");
     }
 
-    private static void createList(String userInput, DoubleLinkedList list) throws Exception {
+    private static void createList(String userInput, DoubleLinkedListDouble list) throws Exception {
         String []stringArray = userInput.split(", ");
         for (String s : stringArray) {
             try {

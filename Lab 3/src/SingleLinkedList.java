@@ -49,7 +49,7 @@ interface ILinkedList {
      * @return a view of the portion of this list between the specified fromIndex and toIndex, inclusively.
      */
 
-    public ILinkedList sublist(int fromIndex, int toIndex);
+    public ILinkedListDouble sublist(int fromIndex, int toIndex);
     /**
      * @param o
      * @return true if this list contains an element with the same value as the specified element.
@@ -67,7 +67,7 @@ class Node {
     }
 }
 
-public class SingleLinkedList implements ILinkedList {
+public class SingleLinkedList implements ILinkedListDouble {
     /* Implement your linked list class here*/
     private Node head;
     private int size;
@@ -169,7 +169,7 @@ public class SingleLinkedList implements ILinkedList {
     }
 
     @Override
-    public ILinkedList sublist(int fromIndex, int toIndex) {
+    public ILinkedListDouble sublist(int fromIndex, int toIndex) {
         if (fromIndex > toIndex) throw new RuntimeException();
         SingleLinkedList newList = new SingleLinkedList();
         for (int i = fromIndex; i <= toIndex; i++){
