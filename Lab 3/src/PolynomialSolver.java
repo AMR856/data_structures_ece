@@ -1,408 +1,660 @@
+import java.util.*;
+import java.lang.Math;
 
-class NodeQasem {
-    int data;
-    NodeQasem next;
+interface ILinkedListPoly {
+    /**
+     * Inserts a specified element at the specified position in the list.
+     * @param index
+     * @param element
+     */
+    public void add(int index, Term element);
+    /**
+     * Inserts the specified element at the end of the list.
+     * @param element
+     */
+    public void add(Term element);
+    /**
+     * @param index
+     * @return the element at the specified position in this list.
+     */
+    public Term get(int index);
 
-    NodeQasem(int d) { data = d; next = null; }
+    /**
+     * Replaces the element at the specified position in this list with the
+     * specified element.
+     * @param index
+     * @param element
+     */
+    public void set(int index, Term element);
+    /**
+     * Removes all of the elements from this list.
+     */
+    public void clear();
+    /**
+     * @return true if this list contains no elements.
+     */
+    public boolean isEmpty();
 }
 
-class Nod {
-    int coefficient;
+class ListNode {
+    Term data;
+    ListNode next;
+
+    ListNode(Term data) {
+        this.data = data;
+        this.next = null;
+    }
+}
+
+class LinkedList implements ILinkedListPoly{
+
+    /* Implement your linked list class here*/
+    ListNode head;
+    int size;
+
+    public LinkedList(){
+        this.head = null;
+        this.size = 0;
+    }
+    @Override
+    public void add(int index, Term element){
+        if (this.head == null && index == 0){
+            this.head = new ListNode(element);
+            this.size++;
+            return;
+        } else if (index == 0){
+            ListNode newNode = new ListNode(element);
+            newNode.next = this.head;
+            this.head = newNode;
+            return;
+        }
+
+        ListNode newNode = new ListNode(element);
+        ListNode currentNode = this.head;
+        int currentIndex = 0;
+        if (index <= -1 || index > size){
+            throw new IndexOutOfBoundsException();
+        }
+        while (currentIndex < index - 1){
+            assert currentNode != null;
+            currentNode = currentNode.next;
+            currentIndex++;
+        }
+        newNode.next = currentNode.next;
+        currentNode.next = newNode;
+        this.size++;
+    }
+
+    @Override
+    public void add(Term element) {
+        add(this.size, element);
+    }
+    @Override
+    public Term get(int index) {
+        if (index < 0 || index > size - 1){
+            throw new IndexOutOfBoundsException();
+        }
+        ListNode currentNode = this.head;
+        int currentIndex = 0;
+        while (currentIndex != index){
+            currentNode = currentNode.next;
+            currentIndex++;
+        }
+        return currentNode.data;
+    }
+
+    @Override
+    public void set(int index, Term element) {
+        if (index < 0 || index > size - 1){
+            throw new IndexOutOfBoundsException();
+        }
+        ListNode currentNode = this.head;
+        int currentIndex = 0;
+        while (currentIndex != index){
+            currentNode = currentNode.next;
+            currentIndex++;
+        }
+        currentNode.data = element;
+    }
+    @Override
+    public void clear() {
+        this.head = null;
+        this.size = 0;
+    }
+    @Override
+    public boolean isEmpty() {
+        return this.head == null || this.size == 0;
+    }
+
+}
+
+interface IPolynomialSolver {
+    /**
+     * Set polynomial terms (coefficients & exponents)
+     * @param poly: name of the polynomial
+     * @param terms: array of [coefficients][exponents]
+     */
+    void setPolynomial(char poly, int[][] terms);
+
+    /**
+     * Print the polynomial in ordered human readable representation
+     * @param poly: name of the polynomial
+     * @return: polynomial in the form like 27x^2+x-1
+     */
+    String print(char poly);
+
+    /**
+     * Clear the polynomial
+     * @param poly: name of the polynomial
+     */
+    void clearPolynomial(char poly);
+
+    /**
+     * Evaluate the polynomial
+     * @param poly: name of the polynomial
+     * @param value: the polynomial constant value
+     * @return the value of the polynomial
+     */
+    float evaluatePolynomial(char poly, float value);
+
+    /**
+     * Add two polynomials
+     * @param poly1: first polynomial
+     * @param poly2: second polynomial
+     * @return the result polynomial
+     */
+    int[][] add(char poly1, char poly2);
+
+    /**
+     * Subtract two polynomials
+     * @param poly1: first polynomial
+     * @param poly2: second polynomial
+     * @return the result polynomial*/
+    int[][] subtract(char poly1, char poly2);
+
+    /**
+     * Multiply two polynomials
+     * @param poly1: first polynomial
+     * @param poly2: second polynomial
+     * @return: the result polynomial
+     */
+    int[][] multiply(char poly1, char poly2);
+}
+
+class Term {
     int exponent;
-    Nod next;
+    int coefficient;
 
-    Nod(int coeff, int exp) { coefficient = coeff; exponent = exp; next = null; }
+    Term (int exponent, int coefficient){
+        this.exponent = exponent;
+        this.coefficient = coefficient;
+    }
 }
 
-public class PolynomialSolver {
-    Nod headA;    // Head for A terms
-    Nod headB;
-    Nod headC;
-    Nod headR;
-    NodeQasem intHead; // linked list for storing input values
+public class PolynomialSolver implements IPolynomialSolver {
 
-    public void add(int value) {
-        NodeQasem newNode = new NodeQasem(value);
+    private LinkedList A;
+    private LinkedList B;
+    private LinkedList C;
+    private LinkedList R;
 
-        if (intHead == null) {
-            intHead = newNode;
-        } else {
-            NodeQasem current = intHead;
-            while (current.next != null) {
-                current = current.next;
-            }
-            current.next = newNode;
-        }
+    PolynomialSolver(){
+        this.A = new LinkedList();
+        this.B = new LinkedList();
+        this.C = new LinkedList();
+        this.R = new LinkedList();
     }
 
-    void setFromLinkedList(NodeQasem coeffHead, char poly) {
-        Nod head = null, current = null;
-
-        int length = 0;
-        NodeQasem temp = coeffHead;
-        while (temp != null) {
-            length++;
-            temp = temp.next;
-        }
-        int exponent = length - 1;
-
-        temp = coeffHead;
-        while (temp != null) {
-            int coefficient = temp.data;
-            Nod newNode = new Nod(coefficient, exponent);
-
-            if (head == null) {
-                head = newNode;
-                current = head;
-            } else {
-                current.next = newNode;
-                current = current.next;
+    public static void main(String[] args) throws Exception {
+        /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+        PolynomialSolver poly = new PolynomialSolver();
+        Scanner sc = new Scanner(System.in);
+        while (sc.hasNext()) {
+            String command = sc.next();
+            sc.nextLine();
+            char polyName1, polyName2;
+            float evalFloatIn;
+            int [][]usedArray;
+            switch (command) {
+                case "set":
+                    polyName1 = sc.next().charAt(0);
+                    sc.nextLine();
+                    String userInput = getTrim(sc);
+                    try {
+                        poly.setPolynomial(polyName1, poly.createList(userInput));
+                    } catch (Exception _) {
+                        System.out.println("Error");
+                        System.exit(0);
+                    }
+                    break;
+                case "clear":
+                    polyName1 = sc.next().toUpperCase().charAt(0);
+                    poly.clearPolynomial(polyName1);
+                    break;
+                case "print":
+                    polyName1 = sc.next().toUpperCase().charAt(0);
+                    System.out.println(poly.print(polyName1));
+                    break;
+                case "add":
+                    polyName1 = sc.next().toUpperCase().charAt(0);
+                    sc.nextLine();
+                    polyName2 = sc.next().toUpperCase().charAt(0);
+                    poly.add(polyName1, polyName2);
+                    System.out.println(poly.print('R'));
+                    break;
+                case "sub":
+                    polyName1 = sc.next().toUpperCase().charAt(0);
+                    sc.nextLine();
+                    polyName2 = sc.next().toUpperCase().charAt(0);
+                    poly.subtract(polyName1, polyName2);
+                    System.out.println(poly.print('R'));
+                    break;
+                case "mult":
+                    polyName1 = sc.next().toUpperCase().charAt(0);
+                    sc.nextLine();
+                    polyName2 = sc.next().toUpperCase().charAt(0);
+                    poly.multiply(polyName1, polyName2);
+                    System.out.println(poly.print('R'));
+                    break;
+                case "eval":
+                    polyName1 = sc.next().toUpperCase().charAt(0);
+                    sc.nextLine();
+                    evalFloatIn = sc.nextFloat();
+                    System.out.println((int) poly.evaluatePolynomial(polyName1, evalFloatIn));
+                    break;
+                default:
+                    System.out.println("Error");
+                    System.exit(0);
             }
-
-            exponent--;
-            temp = temp.next;
         }
-
+    }
+    @Override
+    public void setPolynomial(char poly, int[][] terms) {
+        LinkedList MyPoly = null;
         switch (poly) {
-            case 'A': headA = head; break;
-            case 'B': headB = head; break;
-            case 'C': headC = head; break;
-            case 'R': headR = head; break;
-            default: System.out.println("Error"); break;
-        }
-    }
-
-    void print(char poly) {
-        Nod head = null;
-        switch (poly) {
-            case 'A': head = headA; break;
-            case 'B': head = headB; break;
-            case 'C': head = headC; break;
-            case 'R': head = headR; break;
-            default: System.out.println("Error"); return;
-        }
-
-        if (head == null) {
-            return;
-        }
-
-        StringBuilder result = new StringBuilder();
-        Nod temp = head;
-
-        while (temp != null) {
-            int coeff = temp.coefficient;
-
-            if (temp.exponent == 0) {
-                result.append(coeff);
-            } else if (temp.exponent == 1) {
-                if (coeff == 1) {
-                    result.append("x");
-                } else if (coeff == -1) {
-                    result.append("-x");
-                } else {
-                    result.append(coeff).append("x");
-                }
-            } else {
-                if (coeff == 1) {
-                    result.append("x^").append(temp.exponent);
-                } else if (coeff == -1) {
-                    result.append("-x^").append(temp.exponent);
-                } else {
-                    result.append(coeff).append("x^").append(temp.exponent);
-                }
-            }
-
-            if (temp.next != null && temp.next.coefficient >= 0) {
-                result.append(" + ");
-            } else if (temp.next != null) {
-                result.append(" ");
-            }
-
-            temp = temp.next;
-        }
-
-        System.out.println(result.toString());
-    }
-
-    Nod addPolynomials(Nod poly1, Nod poly2) {
-        Nod resultHead = null, current = null;
-
-        while (poly1 != null || poly2 != null) {
-            int coeff = 0;
-            int exp;
-            if (poly1 == null) {
-                coeff = poly2.coefficient;
-                exp = poly2.exponent;
-                poly2 = poly2.next;
-            } else if (poly2 == null) {
-                coeff = poly1.coefficient;
-                exp = poly1.exponent;
-                poly1 = poly1.next;
-            } else if (poly1.exponent == poly2.exponent) {
-                coeff = poly1.coefficient + poly2.coefficient;
-                exp = poly1.exponent;
-                poly1 = poly1.next;
-
-                poly2 = poly2.next;
-            } else if (poly1.exponent > poly2.exponent) {
-                coeff = poly1.coefficient;
-                exp = poly1.exponent;
-                poly1 = poly1.next;
-            } else {
-                coeff = poly2.coefficient;
-                exp = poly2.exponent;
-                poly2 = poly2.next;
-            }
-
-            if (coeff != 0) {
-                Nod newNode = new Nod(coeff, exp);
-                if (resultHead == null) {
-                    resultHead = newNode;
-                    current = resultHead;
-                } else {
-                    current.next = newNode;
-                    current = current.next;
-                }
-            }
-        }
-        return resultHead;
-    }
-
-    void addPolynomialsToR(char poly1, char poly2) {
-        Nod p1 = null, p2 = null;
-        switch (poly1) {
-            case 'A': p1 = headA; break;
-            case 'B': p1 = headB; break;
-            case 'C': p1 = headC; break;
-            default: System.out.println("Error"); return;
-        }
-
-        switch (poly2) {
-            case 'A': p2 = headA; break;
-            case 'B': p2 = headB; break;
-            case 'C': p2 = headC; break;
-            default: System.out.println("Error"); return;
-        }
-
-        if (p1 == null || p2 == null) {
-            System.out.println("Error");
-            return;
-        }
-
-        headR = addPolynomials(p1, p2);
-        print('R');  // Print R immediately after performing the addition
-    }
-
-    Nod subPolynomials(Nod poly1, Nod poly2) {
-        Nod resultHead = null, current = null;
-
-        while (poly1 != null || poly2 != null) {
-            int coeff;
-            int exp;
-
-            if (poly1 == null) {
-                coeff = -poly2.coefficient;
-                exp = poly2.exponent;
-                poly2 = poly2.next;
-            } else if (poly2 == null) {
-                coeff = poly1.coefficient;
-                exp = poly1.exponent;
-                poly1 = poly1.next;
-            } else if (poly1.exponent == poly2.exponent) {
-                coeff = poly1.coefficient - poly2.coefficient;
-                exp = poly1.exponent;
-                poly1 = poly1.next;
-                poly2 = poly2.next;
-            } else if (poly1.exponent > poly2.exponent) {
-                coeff = poly1.coefficient;
-                exp = poly1.exponent;
-                poly1 = poly1.next;
-            } else {
-                coeff = -poly2.coefficient;
-                exp = poly2.exponent;
-                poly2 = poly2.next;
-            }
-
-            if (coeff != 0) {
-                Nod newNode = new Nod(coeff, exp);
-                if (resultHead == null) {
-                    resultHead = newNode;
-                    current = resultHead;
-                } else {
-                    current.next = newNode;
-                    current = current.next;
-                }
-            }
-        }
-        return resultHead;
-    }
-
-    void subPolynomialsToR(char poly1, char poly2) {
-        Nod p1 = null, p2 = null;
-        switch (poly1) {
-            case 'A': p1 = headA; break;
-            case 'B': p1 = headB; break;
-            case 'C': p1 = headC; break;
-            default: System.out.println("Error"); return;
-        }
-
-        switch (poly2) {
-            case 'A': p2 = headA; break;
-            case 'B': p2 = headB; break;
-            case 'C': p2 = headC; break;
-            default: System.out.println("Error"); return;
-        }
-
-        if (p1 == null || p2 == null) {
-            System.out.println("Error");
-            return;
-        }
-
-        headR = subPolynomials(p1, p2);
-        print('R');  // Print R immediately after performing the subtraction
-    }
-
-    int evaluatePolynomial(Nod poly, int x) {
-        int result = 0;
-
-        while (poly != null) {
-            result += poly.coefficient * Math.pow(x, poly.exponent);
-            poly = poly.next;
-        }
-
-        return result;
-    }
-
-    void evaluatePolynomialAt(int x, char polynomial) {
-        Nod selectedPoly = null;
-
-        switch (polynomial) {
             case 'A':
-                selectedPoly = headA;
+                MyPoly = A;
                 break;
             case 'B':
-                selectedPoly = headB;
+                MyPoly = B;
                 break;
             case 'C':
-                selectedPoly = headC;
+                MyPoly = C;
+                break;
+            default:
+                System.out.print("Error");
+                System.exit(0);
+        }
+
+        try {
+            for (int[] term : terms) {
+                Term t = new Term(term[0], term[1]);
+                MyPoly.add(t);
+            }
+        } catch (Exception e) {
+            System.out.print("Error");
+            System.exit(0);
+        }
+    }
+    @Override
+    public String print(char poly) {
+        LinkedList MyPoly = null;
+        switch (poly) {
+            case 'A':
+                MyPoly = A;
+                break;
+            case 'B':
+                MyPoly = B;
+                break;
+            case 'C':
+                MyPoly = C;
+                break;
+            case 'R':
+                MyPoly = R;
+                break;
+            default:
+                System.out.print("Error");
+                System.exit(0);
+        }
+
+        StringBuilder out = new StringBuilder();
+        ListNode p = MyPoly.head;
+        if (p == null) {
+            System.out.print("Error");
+            System.exit(0);
+        }
+
+        try {
+            boolean FirstTerm = true;
+            while (p != null) {
+                Term temp = p.data;
+                if (temp.coefficient > 0 && !FirstTerm) {
+                    out.append("+");
+                }
+
+                if (temp.coefficient < 0) {
+                    out.append("-");
+                }
+                if (Math.abs(temp.coefficient) > 1) {
+                    out.append(Math.abs(temp.coefficient));
+                }
+                if (temp.exponent >= 2 && temp.coefficient != 0) {
+                    out.append("x^").append(temp.exponent);
+                } else if (temp.exponent == 1 && temp.coefficient != 0) {
+                    out.append("x");
+                }
+                FirstTerm = false;
+                p = p.next;
+            }
+        } catch (Exception e) {
+            System.out.print("Error");
+        }
+        return out.toString();
+    }
+
+    @Override
+    public void clearPolynomial(char poly) {
+        LinkedList myPoly = null;
+        switch (poly) {
+            case 'A':
+                myPoly = A;
+                break;
+            case 'B':
+                myPoly = B;
+                break;
+            case 'C':
+                myPoly = C;
+                break;
+            default:
+                System.out.print("Error");
+                System.exit(0);
+        }
+        try {
+            myPoly.clear();
+            if (myPoly.head == null) System.out.println("[]");
+        } catch (Exception e) {
+            System.out.print("Error");
+            System.exit(0);
+        }
+    }
+
+    @Override
+    public float evaluatePolynomial(char poly, float value) {
+        LinkedList list = null;
+        switch (poly) {
+            case 'A':
+                list = this.A;
+                break;
+            case 'B':
+                list = this.B;
+                break;
+            case 'C':
+                list = this.C;
                 break;
             default:
                 System.out.println("Error");
-                return;
+                System.exit(0);
         }
-
-        if (selectedPoly != null) {
-            int result = evaluatePolynomial(selectedPoly, x);
-            System.out.println(result);
-        } else {
+        float returnedResult = 0;
+        if (list == null || list.head == null){
             System.out.println("Error");
+            System.exit(0);
         }
+        ListNode current = list.head;
+        while (current != null){
+            returnedResult += (Math.pow(value, current.data.exponent) * current.data.coefficient);
+            current = current.next;
+        }
+        return returnedResult;
     }
 
-    void clear(char poly) {
-        switch (poly) {
-            case 'A': headA = null; break;
-            case 'B': headB = null; break;
-            case 'C': headC = null; break;
-            default: System.out.println("Error"); return;
-        }
-        System.out.println("[]");
-    }
+    @Override
+    public int[][] add(char poly1, char poly2) {
+        LinkedList list1 = null;
+        LinkedList list2 = null;
 
-    public static void main(String[] args) {
-        Scanner in = new Scanner(System.in);
-        PolynomialSolver PS = new PolynomialSolver();
-
-        while (in.hasNext()) {
-            String operation = in.nextLine().trim();
-            switch (operation) {
-                case "clear":
-                    String polyToClear = in.nextLine().trim();
-                    if (polyToClear.equals("A")  polyToClear.equals("B")  polyToClear.equals("C")) {
-                    PS.clear(polyToClear.charAt(0));
-                } else {
-                    System.out.println("Error");
-                }
+        switch (poly1) {
+            case 'A':
+                list1 = this.A;
                 break;
+            case 'B':
+                list1 = this.B;
+                break;
+            case 'C':
+                list1 = this.C;
+                break;
+            default:
+                System.out.println("Error");
+                System.exit(0);
+                break;
+        }
+        switch (poly2) {
+            case 'A':
+                list2 = this.A;
+                break;
+            case 'B':
+                list2 = this.B;
+                break;
+            case 'C':
+                list2 = this.C;
+                break;
+            default:
+                System.out.println("Error");
+                System.exit(0);
+                break;
+        }
+        if (list1 == null || list2 == null){
+            System.out.println("Error");
+            System.exit(0);
+        }
+        ListNode current1 = list1.head;
+        ListNode current2 = list2.head;
+        int list1Length = list1.size;
+        int list2Length = list2.size;
+        int sum;
+        if (list1Length > list2Length){
+            R.add(new Term(list1Length - 1, current1.data.coefficient));
+            current1 = current1.next;
+            list1Length--;
+        }
+        else if (list2Length > list1Length) {
+            R.add(new Term(list2Length - 1, current2.data.coefficient));
+            current2 = current2.next;
+            list2Length--;
+        }
+        while (list1Length != 0) {
+            sum = current1.data.coefficient + current2.data.coefficient;
+            if (sum != 0) R.add(new Term(list1Length - 1, sum));
+            current1 = current1.next;
+            current2 = current2.next;
+            list1Length--;
+            list2Length--;
+        }
+        ListNode currentR = R.head;
+        int [][]returnedArray = new int[R.size][2];
+        int i = 0;
+        while (currentR != null){
+            returnedArray[i][0] = currentR.data.exponent;
+            returnedArray[i][1] = currentR.data.coefficient;
+            i++;
+            currentR = currentR.next;
+        }
+        return returnedArray;
+    }
 
-                case "set":
-                    String polyName = in.nextLine().trim();
-                    if (!polyName.equals("A") && !polyName.equals("B") && !polyName.equals("C")) {
-                        System.out.println("Error");
-                        break;
-                    }
+    @Override
+    public int[][] subtract(char poly1, char poly2) {
+        LinkedList list1 = null;
+        LinkedList list2 = null;
 
-                    String input = in.ne xtLine().replaceAll("\\[|\\]", "");
-                    if (!input.isEmpty()) {
-                        PS.intHead = null;
-                        String[] s = input.split(", ");
-                        for (String value : s) {
-                            try {
-                                int number = Integer.parseInt(value.trim());
-                                PS.add(number);
-                            } catch (NumberFormatException e) {
-                                System.out.println("Error");
-                            }
-                        }
-                        PS.setFromLinkedList(PS.intHead, polyName.charAt(0));
-                    }
-                    break;
+        switch (poly1) {
+            case 'A':
+                list1 = this.A;
+                break;
+            case 'B':
+                list1 = this.B;
+                break;
+            case 'C':
+                list1 = this.C;
+                break;
+            default:
+                System.out.println("Error");
+                System.exit(0);
+                break;
+        }
+        switch (poly2) {
+            case 'A':
+                list2 = this.A;
+                break;
+            case 'B':
+                list2 = this.B;
+                break;
+            case 'C':
+                list2 = this.C;
+                break;
+            default:
+                System.out.println("Error");
+                System.exit(0);
+                break;
+        }
+        if (list1 == null || list2 == null){
+            System.out.println("Error");
+            System.exit(0);
+        }
+        ListNode current1 = list1.head;
+        ListNode current2 = list2.head;
+        int list1Length = list1.size;
+        int list2Length = list2.size;
+        int sum;
+        if (list1Length > list2Length){
+            R.add(new Term(list1Length - 1, current1.data.coefficient));
+            current1 = current1.next;
+            list1Length--;
+        }
+        else if (list2Length > list1Length) {
+            R.add(new Term(list2Length - 1, -1 * current2.data.coefficient));
+            current2 = current2.next;
+            list2Length--;
+        }
+        while (list1Length != 0) {
+            sum = current1.data.coefficient - current2.data.coefficient;
+            if (sum != 0) R.add(new Term(list1Length - 1, sum));
+            current1 = current1.next;
+            current2 = current2.next;
+            list1Length--;
+            list2Length--;
+        }
+        ListNode currentR = R.head;
+        int [][]returnedArray = new int[R.size][2];
+        int i = 0;
+        while (currentR != null){
+            returnedArray[i][0] = currentR.data.exponent;
+            returnedArray[i][1] = currentR.data.coefficient;
+            i++;
+            currentR = currentR.next;
+        }
+        return returnedArray;
+    }
 
-                case "print":
-                    String polyToPrint = in.nextLine().trim();
-                    if (!polyToPrint.equals("A") && !polyToPrint.equals("B") && !polyToPrint.equals("C") && !polyToPrint.equals("R")) {
-                        System.out.println("Error");
-                    } else {
-                        PS.print(polyToPrint.charAt(0));
-                    }
-                    break;
+    @Override
+    public int[][] multiply(char poly1, char poly2) {
+        LinkedList list1 = null;
+        LinkedList list2 = null;
+        switch (poly1) {
+            case 'A':
+                list1 = this.A;
+                break;
+            case 'B':
+                list1 = this.B;
+                break;
+            case 'C':
+                list1 = this.C;
+                break;
+            case 'R':
 
-                case "add":
-                    String poly1 = in.nextLine().trim();
-                    String poly2 = in.nextLine().trim();
-                    if (!poly1.equals("A") && !poly1.equals("B") && !poly1.equals("C") ||
-                            !poly2.equals("A") && !poly2.equals("B") && !poly2.equals("C")) {
-                        System.out.println("Error");
-                    } else {
-                        PS.addPolynomialsToR(poly1.charAt(0), poly2.charAt(0));
-                    }
-                    break;
+            default:
+                System.out.println("Error");
+                System.exit(0);
+        }
+        switch (poly2) {
+            case 'A':
+                list2 = this.A;
+                break;
+            case 'B':
+                list2 = this.B;
+                break;
+            case 'C':
+                list2 = this.C;
+                break;
+            default:
+                System.out.println("Error");
+                System.exit(0);
+        }
+        if (list1 == null || list2 == null){
+            System.out.println("Error");
+            System.exit(0);
+        }
 
-                case "sub":
-                    String poly3 = in.nextLine().trim();
-                    String poly4 = in.nextLine().trim();
-                    if (!poly3.equals("A") && !poly3.equals("B") && !poly3.equals("C") ||
-                            !poly4.equals("A") && !poly4.equals("B") && !poly4.equals("C")) {
-                        System.out.println("Error");
-                    } else {
-                        PS.subPolynomialsToR(poly3.charAt(0), poly4.charAt(0));
-                    }
-                    break;
+        int n = list1.size;
+        int m = list2.size;
+        int resultSize = n + m - 1;
 
-                case "eval":
-                    String polyToEval = in.nextLine().trim();
-                    if (!polyToEval.equals("A") && !polyToEval.equals("B") && !polyToEval.equals("C")) {
-                        System.out.println("Error");
-                    } else {
-                        int x = in.nextInt();
-                        PS.evaluatePolynomialAt(x, polyToEval.charAt(0));
-                    }
-                    break;
+        for (int i = 0; i < resultSize; i++) {
+            R.add(new Term(resultSize - i - 1, 0)); // Initializing coefficients to zero
+        }
 
-                case "mult":
-                    String poly8 = in.nextLine().trim();
-                    String poly9 = in.nextLine().trim();
-                    if (!poly8.equals("A") && !poly8.equals("B") && !poly8.equals("C") ||
-                            !poly9.equals("A") && !poly9.equals("B") && !poly9.equals("C")) {
-                        System.out.println("Error");
-                    } else {
-                        PS.subPolynomialsToR(poly8.charAt(0), poly9.charAt(0));
-                    }
-                    break;
+        for (int i = 0; i < n; i++) {
+            Term term1 = (Term) list1.get(i);
 
-                default:
-                    System.out.println("Error");
+            for (int j = 0; j < m; j++) {
+                Term term2 = (Term) list2.get(j);
+
+                int newExponent = term1.exponent + term2.exponent;
+                int productCoefficient = term1.coefficient * term2.coefficient;
+
+                int pos = resultSize - newExponent - 1;
+
+                Term resultTerm = (Term) R.get(pos);
+                resultTerm.coefficient += productCoefficient; // Accumulate the result
             }
         }
+
+
+        ListNode currentR = R.head;
+        int[][] returnedArray = new int[R.size][2];
+        int i = 0;
+        while (currentR != null){
+            returnedArray[i][0] = currentR.data.exponent;
+            returnedArray[i][1] = currentR.data.coefficient;
+            i++;
+            currentR = currentR.next;
+        }
+        return returnedArray;
+    }
+
+    private int[][] createList(String userInput) throws Exception {
+        String[] stringArray = userInput.split(",");
+        int[][] returned2D = new int[stringArray.length][2];
+        for (int i = 0; i < stringArray.length; i++) {
+            try {
+                returned2D[i][0] = stringArray.length - i - 1;
+                returned2D[i][1] = Integer.parseInt(stringArray[i].trim());
+            } catch (Exception e) {
+                System.out.println("Error");
+                System.exit(0);
+            }
+        }
+        return returned2D;
+    }
+
+    private static void printArray(int[][] array){
+        for (int[] i: array) {
+            for (int j : i) System.out.print(j + ", ");
+            System.out.println();
+        }
+        System.out.println();
+    }
+    private static String getTrim(Scanner in) {
+        return in.nextLine().replace("[", "").replace("]", "").trim();
     }
 }

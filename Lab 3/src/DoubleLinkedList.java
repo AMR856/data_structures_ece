@@ -1,58 +1,58 @@
 import java.util.*;
 
 interface ILinkedListDouble {
-/**
-* Inserts a specified element at the specified position in the list.
-* @param index
-* @param element
-*/
-public void add(int index, Object element);
-/**
-* Inserts the specified element at the end of the list.
-* @param element
-*/
-public void add(Object element);
-/**
-* @param index
-* @return the element at the specified position in this list.
-*/
-public Object get(int index);
+    /**
+     * Inserts a specified element at the specified position in the list.
+     * @param index
+     * @param element
+     */
+    public void add(int index, Object element);
+    /**
+     * Inserts the specified element at the end of the list.
+     * @param element
+     */
+    public void add(Object element);
+    /**
+     * @param index
+     * @return the element at the specified position in this list.
+     */
+    public Object get(int index);
 
-/**
-* Replaces the element at the specified position in this list with the
-* specified element.
-* @param index
-* @param element
-*/
-public void set(int index, Object element);
-/**
-* Removes all of the elements from this list.
-*/
-public void clear();
-/**
-* @return true if this list contains no elements.
-*/
-public boolean isEmpty();
-/**
-* Removes the element at the specified position in this list.
-* @param index
-*/
-public void remove(int index);
-/**
-* @return the number of elements in this list.
-*/
-public int size();
-/**
-* @param fromIndex
-* @param toIndex
-* @return a view of the portion of this list between the specified fromIndex and toIndex, inclusively.
-*/
-public ILinkedListDouble sublist(int fromIndex, int toIndex);
-/**
-* @param o
-* @return true if this list contains an element with the same value as the specified element.
-*/
-public boolean contains(Object o);
+    /**
+     * Replaces the element at the specified position in this list with the
+     * specified element.
+     * @param index
+     * @param element
+     */
+    public void set(int index, Object element);
+    /**
+     * Removes all of the elements from this list.
+     */
+    public void clear();
+    /**
+     * @return true if this list contains no elements.
+     */
+    public boolean isEmpty();
+    /**
+     * Removes the element at the specified position in this list.
+     * @param index
+     */
+    public void remove(int index);
+    /**
+     * @return the number of elements in this list.
+     */
+    public int size();
+    /**
+     * @param fromIndex
+     * @param toIndex
+     * @return a view of the portion of this list between the specified fromIndex and toIndex, inclusively.
+     */
+    public ILinkedListDouble sublist(int fromIndex, int toIndex);
+    /**
+     * @param o
+     * @return true if this list contains an element with the same value as the specified element.
+     */
+    public boolean contains(Object o);
 }
 
 class DoublyNode {
@@ -67,12 +67,12 @@ class DoublyNode {
     }
 }
 
-public class DoubleLinkedListDouble implements ILinkedListDouble {
+public class DoubleLinkedList implements ILinkedListDouble {
     private DoublyNode head;
     private DoublyNode tail;
     private int size;
 
-    public DoubleLinkedListDouble() {
+    public DoubleLinkedList() {
         this.head = null;
         this.tail = null;
         this.size = 0;
@@ -82,7 +82,7 @@ public class DoubleLinkedListDouble implements ILinkedListDouble {
     public void add(int index, Object element) {
         if (index < 0 || index > this.size) throw new IndexOutOfBoundsException();
         DoublyNode newNode = new DoublyNode(element);
-        
+
         if (index == 0) {
             if (head == null) {
                 head = tail = newNode;
@@ -118,7 +118,7 @@ public class DoubleLinkedListDouble implements ILinkedListDouble {
 
     private DoublyNode getNodeAt(int index) {
         if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
-        
+
         DoublyNode current;
         if (index < size / 2) {
             current = head;
@@ -150,7 +150,7 @@ public class DoubleLinkedListDouble implements ILinkedListDouble {
     @Override
     public void remove(int index) {
         if (index < 0 || index >= size) throw new IndexOutOfBoundsException();
-        
+
         if (index == 0) {
             if (head == tail) head = tail = null;
             else {
@@ -176,8 +176,8 @@ public class DoubleLinkedListDouble implements ILinkedListDouble {
     @Override
     public ILinkedListDouble sublist(int fromIndex, int toIndex) {
         if (fromIndex < 0 || toIndex >= size || fromIndex > toIndex) throw new IndexOutOfBoundsException();
-        
-        DoubleLinkedListDouble subList = new DoubleLinkedListDouble();
+
+        DoubleLinkedList subList = new DoubleLinkedList();
         DoublyNode current = getNodeAt(fromIndex);
         for (int i = fromIndex; i <= toIndex; i++) {
             subList.add(current.data);
@@ -198,7 +198,7 @@ public class DoubleLinkedListDouble implements ILinkedListDouble {
 
     public static void main(String[] args) {
         int element, index, index1;
-        DoubleLinkedListDouble list = new DoubleLinkedListDouble();
+        DoubleLinkedList list = new DoubleLinkedList();
         Scanner in = new Scanner(System.in);
         String userInput = getTrim(in);
         String requiredCommand = in.nextLine().trim();
@@ -275,8 +275,8 @@ public class DoubleLinkedListDouble implements ILinkedListDouble {
                 index = in.nextInt();
                 index1 = in.nextInt();
                 try {
-                DoubleLinkedListDouble newList = (DoubleLinkedListDouble) list.sublist(index, index1);
-                printList(newList);
+                    DoubleLinkedList newList = (DoubleLinkedList) list.sublist(index, index1);
+                    printList(newList);
                 }
                 catch (Exception _){
                     System.out.println("Error");
@@ -288,8 +288,8 @@ public class DoubleLinkedListDouble implements ILinkedListDouble {
         }
     }
 
-    
-    private static void printList(DoubleLinkedListDouble list) {
+
+    private static void printList(DoubleLinkedList list) {
         DoublyNode currentNode = list.head;
         System.out.print("[");
         while (currentNode != null) {
@@ -300,7 +300,7 @@ public class DoubleLinkedListDouble implements ILinkedListDouble {
         System.out.println("]");
     }
 
-    private static void createList(String userInput, DoubleLinkedListDouble list) throws Exception {
+    private static void createList(String userInput, DoubleLinkedList list) throws Exception {
         String []stringArray = userInput.split(", ");
         for (String s : stringArray) {
             try {
