@@ -59,7 +59,7 @@ interface ILinkedList {
 
 class Node {
     Object data;
-    Node next;
+    NodeQasem next;
 
     Node(Object data) {
         this.data = data;
@@ -69,7 +69,7 @@ class Node {
 
 public class SingleLinkedList implements ILinkedListDouble {
     /* Implement your linked list class here*/
-    private Node head;
+    private NodeQasem head;
     private int size;
 
     public SingleLinkedList(){
@@ -79,18 +79,18 @@ public class SingleLinkedList implements ILinkedListDouble {
 
     public void add(int index, Object element){
         if (this.head == null && index == 0){
-            this.head = new Node(element);
+            this.head = new NodeQasem(element);
             this.size++;
             return;
         } else if (index == 0){
-            Node newNode = new Node(element);
+            NodeQasem newNode = new NodeQasem(element);
             newNode.next = this.head;
             this.head = newNode;
             return;
         }
 
-        Node newNode = new Node(element);
-        Node currentNode = this.head;
+        NodeQasem newNode = new NodeQasem(element);
+        NodeQasem currentNode = this.head;
         int currentIndex = 0;
         if (index <= -1 || index > size){
             throw new IndexOutOfBoundsException();
@@ -113,7 +113,7 @@ public class SingleLinkedList implements ILinkedListDouble {
         if (index < 0 || index > size - 1){
             throw new IndexOutOfBoundsException();
         }
-        Node currentNode = this.head;
+        NodeQasem currentNode = this.head;
         int currentIndex = 0;
         while (currentIndex != index){
             currentNode = currentNode.next;
@@ -127,7 +127,7 @@ public class SingleLinkedList implements ILinkedListDouble {
         if (index < 0 || index > size - 1){
             throw new IndexOutOfBoundsException();
         }
-        Node currentNode = this.head;
+        NodeQasem currentNode = this.head;
         int currentIndex = 0;
         while (currentIndex != index){
             currentNode = currentNode.next;
@@ -154,7 +154,7 @@ public class SingleLinkedList implements ILinkedListDouble {
             this.head = head.next;
             return;
         }
-        Node currentNode = this.head;
+        NodeQasem currentNode = this.head;
         int currentIndex = 0;
         while (currentIndex < index - 1){
             currentNode = currentNode.next;
@@ -179,7 +179,7 @@ public class SingleLinkedList implements ILinkedListDouble {
     }
     @Override
     public boolean contains(Object o) {
-        Node current = this.head;
+        NodeQasem current = this.head;
         boolean doesContain = false;
         while (current != null){
             if (current.data.equals(o)) {
@@ -284,7 +284,7 @@ public class SingleLinkedList implements ILinkedListDouble {
     }
 
     private static void printList(SingleLinkedList list){
-        Node currentNode = list.head;
+        NodeQasem currentNode = list.head;
         System.out.print("[");
         while (currentNode.next != null){
             System.out.print(currentNode.data + ", ");
