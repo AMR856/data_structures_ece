@@ -192,8 +192,8 @@ public class Evaluator implements IExpressionEvaluator {
     public static int opWeight(char c) {
         if (c == '+' || c == '-') return 1;
         else if (c == '*' || c == '/') return 2;
-        else if (c == '^') return 3; // Added power operator
-        else return 0; // Handle invalid operators
+        else if (c == '^') return 3;
+        else return 0;
     }
     public int getCorrespondingValue(char c){
         if (c == 'a') return getA();
